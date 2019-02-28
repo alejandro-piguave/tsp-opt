@@ -67,7 +67,7 @@ public class MainFrame {
 	private void initialize() {
 		
 		frame = new JFrame();
-		frame.setTitle("TSPGEN");
+		frame.setTitle("TSP-Opt");
 		frame.setMinimumSize(new Dimension(MIN_WIDTH,MIN_HEIGHT));
 		frame.setBounds(100, 100, 100+MIN_WIDTH, 100+MIN_HEIGHT);
 		//frame.setResizable(false);
@@ -90,10 +90,13 @@ public class MainFrame {
 		
 		
 		JButton btnOptns = new JButton("...");
+		btnOptns.setEnabled(false);
 		
 		JComboBox<String> algSelector = new JComboBox<String>();
-		algSelector.addItem("Genetic algorithm");
+
 		algSelector.addItem("Check all solutions");
+		algSelector.addItem("Genetic algorithm");
+		algSelector.addItem("Full greedy algorithm");
 		algSelector.addItem("Greedy algorithm");
 		algSelector.addItem("2-opt tour");
 		algSelector.addItem("Greedy + 2-opt tour");
@@ -104,7 +107,7 @@ public class MainFrame {
 		    public void itemStateChanged(ItemEvent event) {
 		       if (event.getStateChange() == ItemEvent.SELECTED) {
 		    	  displayPanel.setCurrentAlgorithm(algSelector.getSelectedIndex());
-		          if(algSelector.getSelectedIndex()==0 || algSelector.getSelectedIndex()==5 || algSelector.getSelectedIndex()==6) {
+		          if(algSelector.getSelectedIndex()==1 || algSelector.getSelectedIndex()==6 || algSelector.getSelectedIndex()==7) {
 		        	  btnOptns.setEnabled(true);
 		        	  extra_options=true;
 		          }else{
@@ -116,6 +119,7 @@ public class MainFrame {
 		
 		JTextArea output = new JTextArea();
 		output.setEditable(false);
+		output.setFont(output.getFont().deriveFont(16f));
 
 		displayPanel.setOutputLabel(output);
 		

@@ -1,4 +1,5 @@
 package main_package;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -21,7 +22,7 @@ import javax.swing.Timer;
 
 
 public class DisplayPanel extends JPanel {
-	private int  node_size=4,max_gen,pop_size,elite_size, current_algorithm,start_temperature;
+	private int  node_size=5,max_gen,pop_size,elite_size, current_algorithm,start_temperature;
 	private boolean is_running, show_result;
 	private double mut_ratio,cooling_rate,absolute_temperature;
 	private long start_time;
@@ -46,7 +47,7 @@ public class DisplayPanel extends JPanel {
 		nodes = new ArrayList<Node>();
 		random = new Random();	
 
-		setBackground(Color.BLACK);
+		setBackground(Color.WHITE);
 		
         Timer timer = new Timer(40, new ActionListener() {
             @Override
@@ -60,10 +61,8 @@ public class DisplayPanel extends JPanel {
         timer.start();
     }
 
-
 	
 	private void runSimulatedAnnealing() {
-		int count=1;
 		if(bestPath==null) {
 			ArrayList<Integer> list = new ArrayList<Integer>();
 			for (int i=0; i<nodes.size(); i++) 
@@ -109,12 +108,11 @@ public class DisplayPanel extends JPanel {
         				improved=true;
         				tempBest=new Path(new_path);
         	  			float lastBestSolTime = (System.currentTimeMillis()-start_time)/1000f;
-        	  			output_lines[2]="Best distance: "+String.format("%.02f", tempBest.distance)+",";
+        	  			output_lines[2]="Best length: "+String.format("%.02f", tempBest.distance)+",";
         	  			output_lines[3]="found in: "+String.format("%.03f", lastBestSolTime)+" s";
         	  			
         	  			
-        	  			System.out.println(count+"&"+lastBestSolTime+"s&"+bestPath.distance+"\\\\ \n\\hline");
-        	  			count++;
+        	  			//System.out.println(count+"&"+lastBestSolTime+"s&"+bestPath.distance+"\\\\ \n\\hline");
         			}
         			
         			if(currentPath.distance <= bestPath.distance 
@@ -128,7 +126,7 @@ public class DisplayPanel extends JPanel {
         	
         }
     	bestPath=tempBest;
-    	System.out.println("=================================================================");
+    	//System.out.println("=================================================================");
 	}
 	private void run2OptAlgorithm() {
 		int count=1;
@@ -169,19 +167,18 @@ public class DisplayPanel extends JPanel {
         	  			bestPath = new Path(new_path);
 
         	  			float lastBestSolTime = (System.currentTimeMillis()-start_time)/1000f;
-        	  			output_lines[1]="Best distance: "+String.format("%.02f", bestPath.distance)+",";
+        	  			output_lines[1]="Best length: "+String.format("%.02f", bestPath.distance)+",";
         	  			output_lines[2]="found in: "+String.format("%.03f", lastBestSolTime)+" s";
         	  			
-        	  			System.out.println(count+"&"+lastBestSolTime+"s&"+bestPath.distance+"\\\\ \n\\hline");
+        	  			//System.out.println(count+"&"+lastBestSolTime+"s&"+bestPath.distance+"\\\\ \n\\hline");
         	  			count++;
         			}
         		}
         	}
         }
-    	System.out.println("=================================================================");
+    	//System.out.println("=================================================================");
 	}
 	private void runGeneticAlgorithm() {
-		int count=1;
 		//long start_time=System.currentTimeMillis();
 		output_lines=new String[] {"","","","","",""};
 		ArrayList<Path> population = new ArrayList<Path>();
@@ -211,12 +208,11 @@ public class DisplayPanel extends JPanel {
     		if(population.get(0).distance<bestPath.distance) {
     			bestPath = new Path(population.get(0).route);
     			float lastBestSolTime = (System.currentTimeMillis()-start_time)/1000f;
-	  			output_lines[2]="Best distance: "+String.format("%.02f", bestPath.distance)+",";
+	  			output_lines[2]="Best length: "+String.format("%.02f", bestPath.distance)+",";
 	  			output_lines[3]="found in: "+String.format("%.03f", lastBestSolTime)+" s,";
 	  			output_lines[4]="in generation #"+currentGen;
 	  			
-	  			System.out.println(count+"&"+lastBestSolTime+"s&"+bestPath.distance+"\\\\ \n\\hline");
-	  			count++;
+	  			//System.out.println(count+"&"+lastBestSolTime+"s&"+bestPath.distance+"\\\\ \n\\hline");
     		}
 			currentPath = new Path(population.get(0).route);
 
@@ -230,7 +226,53 @@ public class DisplayPanel extends JPanel {
 
 	}
     
-	private void runGreedyAlgorithm() {
+	private void runRandomGreedy(){
+		output_lines=new String[] {"","",""};
+		int startingNode=random.nextInt(nodes.size());
+		bestPath = null;
+		currentPath = null;
+
+			int path[] = new int[nodes.size()];
+			path[0]=startingNode;
+			ArrayList<Node> pool= new ArrayList<Node>(nodes);
+			pool.remove(nodes.get(startingNode));
+			Node lastNode = nodes.get(startingNode);
+			for(int i =1; i<nodes.size();i++) {
+				double min_distance=Double.MAX_VALUE;
+				Node nearestNode = null;
+				for(Node n:pool) {
+					double d =lastNode.distanceTo(n);
+					if(d < min_distance) {
+						nearestNode = n;
+						min_distance=d;
+					}
+				}
+				path[i]=nodes.indexOf(nearestNode);
+				lastNode = nearestNode;
+				pool.remove(nearestNode);
+				
+//				int temp_path[]=new int[i+1];
+//				System.arraycopy( path, 0, temp_path, 0, i+1 );
+//				
+//				currentPath=new Path(temp_path);
+//				bestPath = new Path(temp_path);
+//				try {
+//					Thread.sleep(250);
+//				} catch (InterruptedException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//				System.out.println(temp_path.length);
+//				System.out.println(Arrays.toString(temp_path));
+			}
+	    	Path newPath = new Path(path);
+	  			bestPath = newPath;
+	  			float solvingTime = (System.currentTimeMillis()-start_time)/1000f;
+	  			output_lines[0]="Length: "+String.format("%.02f", bestPath.distance)+",";
+	  			output_lines[1]="found in: "+String.format("%.03f", solvingTime)+" s";
+	    	  
+	}
+	private void runFullGreedy() {
 		//long start_time=System.currentTimeMillis();
 		output_lines=new String[] {"","",""};
 		int startingNode=0;
@@ -267,7 +309,7 @@ public class DisplayPanel extends JPanel {
 	    		bestDistance = newPath.distance;
 	  			bestPath = newPath;
 	  			float lastBestSolTime = (System.currentTimeMillis()-start_time)/1000f;
-	  			output_lines[1]="Best distance: "+String.format("%.02f", bestDistance)+",";
+	  			output_lines[1]="Best length: "+String.format("%.02f", bestDistance)+",";
 	  			output_lines[2]="found in: "+String.format("%.03f", lastBestSolTime)+" s";
 	    	  }
 	    	  currentPath=newPath;
@@ -278,7 +320,7 @@ public class DisplayPanel extends JPanel {
 	private void runAllSolAlgorithm() {
 		//long start_time=System.currentTimeMillis();
 
-		int count=1;
+
 		output_lines=new String[] {"","","",""};
 		int lexOrder[] = new int[nodes.size()];
 		long solNum = factorial(nodes.size()-1)/2,currentSol=1;
@@ -323,11 +365,10 @@ public class DisplayPanel extends JPanel {
 	    	  if(currentPath.distance<bestPath.distance) {
 	  			bestPath = currentPath;
 	  			float lastBestSolTime = (System.currentTimeMillis()-start_time)/1000f;
-	  			output_lines[2]="Best distance: "+String.format("%.02f", bestPath.distance)+",";
+	  			output_lines[2]="Best length: "+String.format("%.02f", bestPath.distance)+",";
 	  			output_lines[3]="found in: "+String.format("%.03f", lastBestSolTime)+" s";
 	  			
-	  			System.out.println(count+"&"+lastBestSolTime+"s&"+bestPath.distance+"\\\\ \n\\hline");
-	  			count++;
+	  			//System.out.println(count+"&"+lastBestSolTime+"s&"+bestPath.distance+"\\\\ \n\\hline");
 	    	  }
 	    	  currentSol++;
 	    	  
@@ -338,18 +379,19 @@ public class DisplayPanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
+        g2.setStroke(new BasicStroke(2.5f));
         if(is_running && currentPath!=null && bestPath!=null) {
-        	g2.setColor(Color.WHITE);
+        	g2.setColor(Color.BLACK);
         	paintRoute(g2,currentPath);
-            g2.setColor(Color.RED);
+            g2.setColor(Color.BLUE);
             paintRoute(g2,bestPath);
             }
         if(show_result) {
-            g2.setColor(Color.RED);
+            g2.setColor(Color.BLUE);
             paintRoute(g2,bestPath);
             }
         if(nodes.size()>0) {
-            g2.setColor(Color.WHITE);
+            g2.setColor(Color.BLACK);
             for(Node node: nodes) {
             	Rectangle2D.Float square = new Rectangle2D.Float(node.x-node_size/2f, node.y-node_size/2f,node_size, node_size);
                 g2.fill(square);
@@ -594,26 +636,31 @@ public class DisplayPanel extends JPanel {
 				start_time=System.currentTimeMillis();
 				switch(current_algorithm) {
 				case 0: 
-					runGeneticAlgorithm();
-					break;
-				case 1:
 					runAllSolAlgorithm();
 					break;
+				case 1:
+					runGeneticAlgorithm();
+					break;
 				case 2:
-					runGreedyAlgorithm();
+					runFullGreedy();
 					break;
 				case 3:
-					run2OptAlgorithm();
+					runRandomGreedy();
 					break;
 				case 4:
-					runGreedyAlgorithm();
 					run2OptAlgorithm();
 					break;
 				case 5:
-					runSimulatedAnnealing();
+					runRandomGreedy();
+					//runGreedyAlgorithm();
+					run2OptAlgorithm();
 					break;
 				case 6:
-					runGreedyAlgorithm();
+					runSimulatedAnnealing();
+					break;
+				case 7:
+					runRandomGreedy();
+					//runGreedyAlgorithm();
 					runSimulatedAnnealing();
 					break;   
 				}
