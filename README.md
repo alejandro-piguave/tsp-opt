@@ -1,2 +1,2 @@
 # tsp-opt
-A repository for a school project.
+A repository for an investigation project.
